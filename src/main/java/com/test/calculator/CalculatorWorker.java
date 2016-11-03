@@ -4,7 +4,6 @@ import com.test.calculator.entitites.CalcResult;
 import com.test.calculator.entitites.ErrorResult;
 import com.test.calculator.entitites.PositionInput;
 import com.test.calculator.entitites.exceptions.ErrorException;
-import com.test.calculator.entitites.exceptions.RetryNeededException;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,7 +40,7 @@ public class CalculatorWorker implements Runnable {
                 // 2. Register calculation task in hazelcast in memory map
 
                 // 3. do calc
-                doCalc(inputPositionInput);
+                doCalcAndSendResultBack(inputPositionInput);
 
                 // 5. Remove calc status from hazelcast in memory map
                 // TODO
@@ -57,7 +56,7 @@ public class CalculatorWorker implements Runnable {
         System.out.println("------------------------------------" + Thread.currentThread().getName() + " Thread interrupted, exiting.");
     }
 
-    private void doCalc(PositionInput inputPositionInput) throws InterruptedException {
+    private void doCalcAndSendResultBack(PositionInput inputPositionInput) throws InterruptedException {
 
         // 4. create and return result
         int whatToReturn = ThreadLocalRandom.current().nextInt(1, 3);

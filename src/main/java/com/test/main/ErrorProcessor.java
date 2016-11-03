@@ -1,20 +1,18 @@
 package com.test.main;
 
-import com.test.calculator.entitites.CalcResult;
 import com.test.calculator.entitites.ErrorResult;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Gabor on 2016.11.01..
  */
 public class ErrorProcessor implements Runnable {
-    public static final AtomicInteger errorCounter = new AtomicInteger(0);
-
+    final CompletionListener completionListener;
     final BlockingQueue<ErrorResult> errorQueue;
 
-    public ErrorProcessor(BlockingQueue<ErrorResult> errorQueue) {
+    public ErrorProcessor(CompletionListener completionListener, BlockingQueue<ErrorResult> errorQueue) {
+        this.completionListener = completionListener;
         this.errorQueue = errorQueue;
     }
 
@@ -25,12 +23,17 @@ public class ErrorProcessor implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 ErrorResult errorResult = errorQueue.take();
-//                System.out.println("Error processed: " + errorResult.getPositionId() + " queue size: " + errorQueue.size());
-                errorCounter.getAndIncrement();
+                updateProcessingStatus();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
-        System.out.println("---------------------" + Thread.currentThread().getName() + " Thread interrupted, exiting.");
+        System.out.println("--------------------- " + Thread.currentThread().getName() + " Thread interrupted, exiting.");
+    }
+
+    private void updateProcessingStatus() {
+        if (MainThread.processedPositions.incrementAndGet() == MainThread.feededPositions.get()) {
+            completionListener.processingComplete();
+        }
     }
 }

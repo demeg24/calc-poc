@@ -19,14 +19,16 @@ public class InputFeeder implements Runnable {
     @Override
     public void run() {
         Thread.currentThread().setName("Feeder thread");
+        int numberOfPositionsToFeed = 2000000;
+        MainThread.feededPositions.set(numberOfPositionsToFeed);
 
         while (!Thread.currentThread().isInterrupted()) {
-            try {// Feed the data through hazelcast
-                for (int i = 0; i < 8000000; i++) {
+            try {
+                for (int i = 0; i < numberOfPositionsToFeed; i++) {
                     inputQueue.put(new PositionInput(new Position(i, "desc " + i)));
-//                System.out.println("Input added to queue: " + i);
                 }
-                System.out.println(LocalDateTime.now() + " Stopped feeding, leaving thread.");
+
+                System.out.println("--------------------- InputFeeder stopped feeding, exiting thread.");
                 return;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

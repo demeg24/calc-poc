@@ -38,7 +38,6 @@ public class CalculatorWorker implements Runnable {
             try {
                 // 1. start reading input
                 inputPositionInput = inputQueue.take();
-
                 // 2. Register calculation task in hazelcast in memory map
 
                 // 3. do calc

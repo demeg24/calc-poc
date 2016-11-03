@@ -26,25 +26,16 @@ public class Calculator {
         this.errorQueue = errorQueue;
     }
 
-    public void createAndStartWorkers() {
+    public void startCalculator() {
         for (int i = 0; i < poolSize; i++) {
-            threadPoolExecutorService.submit(new CalculatorWorker(inputQueue, resultQueue, errorQueue, i));
+            threadPoolExecutorService.execute(new CalculatorWorker(inputQueue, resultQueue, errorQueue, i));
         }
     }
 
     /**
      * Called from outside whenever needed.
      */
-    public void gracefulShutDownWorkers() {
-        try {
-            if (!threadPoolExecutorService.awaitTermination(15, TimeUnit.SECONDS)) {
-                threadPoolExecutorService.shutdownNow();
-            }
-
-            // Create error tasks from pending positions and put it to queue
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void stopCalculator() {
+        threadPoolExecutorService.shutdownNow();
     }
 }
